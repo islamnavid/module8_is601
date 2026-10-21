@@ -1,264 +1,311 @@
-# 📦 Project Setup
 
----
+# Module 8 - FastAPI Calculator
 
-# 🧩 1. Install Homebrew (Mac Only)
+## Project Overview
 
-> Skip this step if you're on Windows.
+This project is a web-based calculator built using Python and FastAPI for NJIT IS601 Module 8.
 
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
+The application allows users to perform four basic arithmetic operations through a browser interface and REST API.
 
-**Install Homebrew:**
+The project includes automated unit tests, integration tests, end-to-end tests using Playwright, application logging, and continuous integration using GitHub Actions.
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+## Features
 
-**Verify Homebrew:**
+- Addition
+- Subtraction
+- Multiplication
+- Division
+- Division-by-zero error handling
+- Input validation
+- Web-based calculator interface
+- REST API endpoints
+- Application logging
+- Automated testing
+- GitHub Actions CI workflow
 
-```bash
-brew --version
-```
+## Technologies Used
 
-If you see a version number, you're good to go.
+- Python 3.12
+- FastAPI
+- Uvicorn
+- Pydantic
+- Jinja2
+- Pytest
+- Playwright
+- pytest-cov
+- Git and GitHub
+- GitHub Actions
 
----
+## Installation
 
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
-
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
+### 1. Clone the Repository
 
 ```bash
-git --version
+git clone https://github.com/islamnavid/module8_is601.git
+cd module8_is601
 ```
 
----
+### 2. Create a Virtual Environment
 
-## Configure Git Globals
-
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
-
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
-
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
+Mac/Linux:
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
+source venv/bin/activate
 ```
 
-### Install Required Packages
+Windows:
 
 ```bash
-pip install -r requirements.txt
+python -m venv venv
+venv\Scripts\activate
 ```
 
----
-
-# 🐳 5. (Optional) Docker Setup
-
-> Skip if Docker isn't used in this module.
-
-## Install Docker
-
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-## Build Docker Image
+### 3. Install Dependencies
 
 ```bash
-docker build -t <image-name> .
+python -m pip install -r requirements.txt
 ```
 
-## Run Docker Container
+### 4. Install Playwright Browser
 
 ```bash
-docker run -it --rm <image-name>
+python -m playwright install chromium
 ```
 
----
+## Running the Application
 
-# 🚀 6. Running the Project
-
-- **Without Docker**:
+Start the FastAPI development server:
 
 ```bash
-python main.py
+python -m uvicorn main:app --reload
 ```
 
-(or update this if the main script is different.)
+Open the calculator in your browser:
 
-- **With Docker**:
+http://127.0.0.1:8000
+
+FastAPI automatically generates interactive API documentation:
+
+http://127.0.0.1:8000/docs
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | / | Display calculator interface |
+| POST | /add | Add two numbers |
+| POST | /subtract | Subtract two numbers |
+| POST | /multiply | Multiply two numbers |
+| POST | /divide | Divide two numbers |
+
+### Example API Request
+
+POST /add
+
+```json
+{
+  "a": 10,
+  "b": 5
+}
+```
+
+Expected response:
+
+```json
+{
+  "result": 15
+}
+```
+
+### Division by Zero
+
+POST /divide
+
+```json
+{
+  "a": 10,
+  "b": 0
+}
+```
+
+The application returns HTTP 400 with an error response:
+
+```json
+{
+  "error": "Cannot divide by zero!"
+}
+```
+
+## Automated Testing
+
+The application uses three levels of automated testing.
+
+### Unit Tests
+
+Unit tests verify the arithmetic functions independently.
+
+They cover:
+
+- Positive and negative numbers
+- Integer and decimal calculations
+- Zero values
+- Large numbers
+- Decimal precision
+- Division by zero
+
+Total: 39 unit tests.
+
+Run:
 
 ```bash
-docker run -it --rm <image-name>
+python -m pytest tests/unit -v
 ```
 
----
+### Integration Tests
 
-# 📝 7. Submission Instructions
+Integration tests verify FastAPI endpoints and their responses.
 
-After finishing your work:
+They cover:
+
+- Successful arithmetic requests
+- Negative and decimal inputs
+- Missing request fields
+- Invalid input types
+- Null values
+- Division-by-zero errors
+- Homepage availability
+- OpenAPI documentation
+
+Total: 25 integration tests.
+
+Run:
 
 ```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
+python -m pytest tests/integration -v
 ```
 
-Then submit the GitHub repository link as instructed.
+### End-to-End Tests
 
----
+Playwright tests simulate real browser interactions.
 
-# 🔥 Useful Commands Cheat Sheet
+They cover:
 
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
+- Loading the homepage
+- Addition
+- Subtraction
+- Multiplication
+- Division
+- Division-by-zero errors
+- Negative numbers
+- Decimal numbers
+- Multiple consecutive calculations
 
----
+Total: 9 end-to-end tests.
 
-# 📋 Notes
+Run:
 
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
+```bash
+python -m pytest tests/e2e -v --no-cov
+```
 
----
+### Run All Tests
 
-# 📎 Quick Links
+```bash
+python -m pytest -v
+```
 
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+Latest verified local result:
+
+```text
+73 passed
+```
+
+The arithmetic operations module achieved 100% statement coverage.
+
+Coverage is generated using pytest-cov and can be viewed in the `htmlcov` directory after running tests.
+
+## Application Logging
+
+Python's logging module records important application events.
+
+The application logs:
+
+- Homepage access
+- Successful arithmetic operations
+- Validation errors
+- Division-by-zero errors
+- Other operation errors
+
+Logging helps developers monitor application behavior and troubleshoot problems.
+
+## Continuous Integration
+
+GitHub Actions automatically executes tests whenever changes are pushed to the main branch or a pull request targets main.
+
+The workflow is defined in:
+
+`.github/workflows/test.yml`
+
+The workflow:
+
+1. Checks out the repository.
+2. Configures Python 3.12.
+3. Installs project dependencies.
+4. Installs Playwright Chromium and its dependencies.
+5. Runs unit and integration tests.
+6. Runs Playwright end-to-end tests.
+7. Uploads the HTML coverage report as an artifact.
+
+The latest verified GitHub Actions workflow completed successfully.
+
+View workflow results:
+
+https://github.com/islamnavid/module8_is601/actions
+
+## Project Structure
+
+```text
+module8_is601/
+├── .github/
+│   └── workflows/
+│       └── test.yml
+├── app/
+│   └── operations/
+│       └── __init__.py
+├── templates/
+│   └── index.html
+├── tests/
+│   ├── unit/
+│   │   └── test_calculator.py
+│   ├── integration/
+│   │   └── test_fastapi_calculator.py
+│   └── e2e/
+│       └── test_e2e.py
+├── main.py
+├── requirements.txt
+├── pytest.ini
+└── README.md
+```
+
+## Development Process
+
+The project was developed and tested incrementally using Git commits.
+
+Major improvements included:
+
+1. Configuring and running the FastAPI application.
+2. Enhancing application logging.
+3. Configuring GitHub Actions.
+4. Expanding arithmetic unit tests.
+5. Adding API validation and edge-case integration tests.
+6. Expanding Playwright browser tests.
+7. Verifying all 73 tests locally and through CI.
+
+## Author
+
+Navid Islam
+
+NJIT - IS601 Python Programming
+
+GitHub: https://github.com/islamnavid
