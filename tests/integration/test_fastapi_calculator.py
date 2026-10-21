@@ -1,154 +1,139 @@
+
 # tests/integration/test_fastapi_calculator.py
 
-import pytest  # Import the pytest framework for writing and running tests
-from fastapi.testclient import TestClient  # Import TestClient for simulating API requests
-from main import app  # Import the FastAPI app instance from your main application file
+"""
+Integration tests for the FastAPI Calculator.
 
-# ---------------------------------------------
-# Pytest Fixture: client
-# ---------------------------------------------
+These tests verify arithmetic endpoints, request validation,
+HTTP status codes, and error responses.
+"""
+
+import pytest
+from fastapi.testclient import TestClient
+
+from main import app
+
 
 @pytest.fixture
 def client():
-    """
-    Pytest Fixture to create a TestClient for the FastAPI application.
+    """Create a test client for the FastAPI application."""
+    with TestClient(app) as test_client:
+        yield test_client
 
-    This fixture initializes a TestClient instance that can be used to simulate
-    requests to the FastAPI application without running a live server. The client
-    is yielded to the test functions and properly closed after the tests complete.
 
-    Benefits:
-    - Speeds up testing by avoiding the overhead of running a server.
-    - Allows for testing API endpoints in isolation.
-    """
-    with TestClient(app) as client:
-        yield client  # Provide the TestClient instance to the test functions
-
-# ---------------------------------------------
-# Test Function: test_add_api
-# ---------------------------------------------
+# Original arithmetic endpoint tests
 
 def test_add_api(client):
-    """
-    Test the Addition API Endpoint.
+    response = client.post("/add", json={"a": 10, "b": 5})
+    assert response.status_code == 200
+    assert response.json()["result"] == 15
 
-    This test verifies that the `/add` endpoint correctly adds two numbers provided
-    in the JSON payload and returns the expected result.
-
-    Steps:
-    1. Send a POST request to the `/add` endpoint with JSON data `{'a': 10, 'b': 5}`.
-    2. Assert that the response status code is `200 OK`.
-    3. Assert that the JSON response contains the correct result (`15`).
-    """
-    # Send a POST request to the '/add' endpoint with JSON payload
-    response = client.post('/add', json={'a': 10, 'b': 5})
-    
-    # Assert that the response status code is 200 (OK)
-    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-    
-    # Assert that the JSON response contains the correct 'result' value
-    assert response.json()['result'] == 15, f"Expected result 15, got {response.json()['result']}"
-
-# ---------------------------------------------
-# Test Function: test_subtract_api
-# ---------------------------------------------
 
 def test_subtract_api(client):
-    """
-    Test the Subtraction API Endpoint.
+    response = client.post("/subtract", json={"a": 10, "b": 5})
+    assert response.status_code == 200
+    assert response.json()["result"] == 5
 
-    This test verifies that the `/subtract` endpoint correctly subtracts the second number
-    from the first number provided in the JSON payload and returns the expected result.
-
-    Steps:
-    1. Send a POST request to the `/subtract` endpoint with JSON data `{'a': 10, 'b': 5}`.
-    2. Assert that the response status code is `200 OK`.
-    3. Assert that the JSON response contains the correct result (`5`).
-    """
-    # Send a POST request to the '/subtract' endpoint with JSON payload
-    response = client.post('/subtract', json={'a': 10, 'b': 5})
-    
-    # Assert that the response status code is 200 (OK)
-    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-    
-    # Assert that the JSON response contains the correct 'result' value
-    assert response.json()['result'] == 5, f"Expected result 5, got {response.json()['result']}"
-
-# ---------------------------------------------
-# Test Function: test_multiply_api
-# ---------------------------------------------
 
 def test_multiply_api(client):
-    """
-    Test the Multiplication API Endpoint.
+    response = client.post("/multiply", json={"a": 10, "b": 5})
+    assert response.status_code == 200
+    assert response.json()["result"] == 50
 
-    This test verifies that the `/multiply` endpoint correctly multiplies two numbers
-    provided in the JSON payload and returns the expected result.
-
-    Steps:
-    1. Send a POST request to the `/multiply` endpoint with JSON data `{'a': 10, 'b': 5}`.
-    2. Assert that the response status code is `200 OK`.
-    3. Assert that the JSON response contains the correct result (`50`).
-    """
-    # Send a POST request to the '/multiply' endpoint with JSON payload
-    response = client.post('/multiply', json={'a': 10, 'b': 5})
-    
-    # Assert that the response status code is 200 (OK)
-    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-    
-    # Assert that the JSON response contains the correct 'result' value
-    assert response.json()['result'] == 50, f"Expected result 50, got {response.json()['result']}"
-
-# ---------------------------------------------
-# Test Function: test_divide_api
-# ---------------------------------------------
 
 def test_divide_api(client):
-    """
-    Test the Division API Endpoint.
+    response = client.post("/divide", json={"a": 10, "b": 2})
+    assert response.status_code == 200
+    assert response.json()["result"] == 5
 
-    This test verifies that the `/divide` endpoint correctly divides the first number
-    by the second number provided in the JSON payload and returns the expected result.
-
-    Steps:
-    1. Send a POST request to the `/divide` endpoint with JSON data `{'a': 10, 'b': 2}`.
-    2. Assert that the response status code is `200 OK`.
-    3. Assert that the JSON response contains the correct result (`5`).
-    """
-    # Send a POST request to the '/divide' endpoint with JSON payload
-    response = client.post('/divide', json={'a': 10, 'b': 2})
-    
-    # Assert that the response status code is 200 (OK)
-    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-    
-    # Assert that the JSON response contains the correct 'result' value
-    assert response.json()['result'] == 5, f"Expected result 5, got {response.json()['result']}"
-
-# ---------------------------------------------
-# Test Function: test_divide_by_zero_api
-# ---------------------------------------------
 
 def test_divide_by_zero_api(client):
-    """
-    Test the Division by Zero API Endpoint.
+    response = client.post("/divide", json={"a": 10, "b": 0})
+    assert response.status_code == 400
+    assert response.json()["error"] == "Cannot divide by zero!"
 
-    This test verifies that the `/divide` endpoint correctly handles division by zero
-    by returning an appropriate error message and status code.
 
-    Steps:
-    1. Send a POST request to the `/divide` endpoint with JSON data `{'a': 10, 'b': 0}`.
-    2. Assert that the response status code is `400 Bad Request`.
-    3. Assert that the JSON response contains an 'error' field with the message "Cannot divide by zero!".
-    """
-    # Send a POST request to the '/divide' endpoint with JSON payload attempting division by zero
-    response = client.post('/divide', json={'a': 10, 'b': 0})
-    
-    # Assert that the response status code is 400 (Bad Request), indicating an error occurred
-    assert response.status_code == 400, f"Expected status code 400, got {response.status_code}"
-    
-    # Assert that the JSON response contains an 'error' field
-    assert 'error' in response.json(), "Response JSON does not contain 'error' field"
-    
-    # Assert that the 'error' field contains the correct error message
-    assert "Cannot divide by zero!" in response.json()['error'], \
-        f"Expected error message 'Cannot divide by zero!', got '{response.json()['error']}'"
+# Additional arithmetic scenarios
+
+@pytest.mark.parametrize(
+    "endpoint, a, b, expected",
+    [
+        pytest.param("/add", -5, 3, -2, id="add_negative_number"),
+        pytest.param("/add", 0.1, 0.2, 0.3, id="add_decimals"),
+        pytest.param("/subtract", 5, -3, 8, id="subtract_negative"),
+        pytest.param("/subtract", 0, 10, -10, id="subtract_from_zero"),
+        pytest.param("/multiply", -4, -5, 20, id="multiply_negatives"),
+        pytest.param("/multiply", 0, 100, 0, id="multiply_by_zero"),
+        pytest.param("/divide", 10, -2, -5, id="divide_negative"),
+        pytest.param("/divide", 5, 2, 2.5, id="divide_fractional"),
+    ],
+)
+def test_api_additional_operations(client, endpoint, a, b, expected):
+    response = client.post(endpoint, json={"a": a, "b": b})
+
+    assert response.status_code == 200
+    assert response.json()["result"] == pytest.approx(expected)
+
+
+# Invalid and missing input tests
+
+@pytest.mark.parametrize(
+    "endpoint",
+    ["/add", "/subtract", "/multiply", "/divide"],
+)
+def test_api_missing_second_number(client, endpoint):
+    response = client.post(endpoint, json={"a": 10})
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+    assert "b" in response.json()["error"]
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    ["/add", "/subtract", "/multiply", "/divide"],
+)
+def test_api_invalid_number(client, endpoint):
+    response = client.post(
+        endpoint,
+        json={"a": "not-a-number", "b": 5},
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_api_missing_both_numbers(client):
+    response = client.post("/add", json={})
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_api_null_number(client):
+    response = client.post("/multiply", json={"a": None, "b": 5})
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+# Homepage and API documentation tests
+
+def test_homepage(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "Hello World" in response.text
+    assert "Calculator" in response.text
+
+
+def test_openapi_documentation(client):
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+
+    paths = response.json()["paths"]
+
+    for endpoint in ["/add", "/subtract", "/multiply", "/divide"]:
+        assert endpoint in paths
+        assert "post" in paths[endpoint]
